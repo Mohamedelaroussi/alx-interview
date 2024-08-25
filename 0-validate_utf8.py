@@ -1,72 +1,31 @@
 #!/usr/bin/python3
-"""UTF-8 validation module.
+"""
+Determines if a given data set represents a valid UTF-8 encoding.
 """
 
 
 def validUTF8(data):
-    """Checks if a given list of integers data set represents a valid UTF-8
-    encoding.
-
-    A character in UTF-8 can be 1 to 4 bytes long.
-    The data set can contain multiple characters.
-    The data will be represented by a list of integers.
-
-    Args:
-        data (list): A list of integers where each integer represents a byte
-        of the data.
-
-    Returns:
-        bool: True or False.
     """
-    skip = 0
-    n = len(data)
-    for i in range(n):
-        if skip > 0:
-            skip -= 1
-            continue
-        if type(data[i]) != int or data[i] < 0 or data[i] > 0x10ffff:
-            return False
-        elif data[i] <= 0x7f:
-            skip = 0
-        elif data[i] & 0b11111000 == 0b11110000:
-            # 4-byte utf-8 character encoding
-            span = 4
-            if n - i >= span:
-                next_body = list(map(
-                    lambda x: x & 0b11000000 == 0b10000000,
-                    data[i + 1: i + span],
-                ))
-                if not all(next_body):
-                    return False
-                skip = span - 1
-            else:
-                return False
-        elif data[i] & 0b11110000 == 0b11100000:
-            # 3-byte utf-8 character encoding
-            span = 3
-            if n - i >= span:
-                next_body = list(map(
-                    lambda x: x & 0b11000000 == 0b10000000,
-                    data[i + 1: i + span],
-                ))
-                if not all(next_body):
-                    return False
-                skip = span - 1
-            else:
-                return False
-        elif data[i] & 0b11100000 == 0b11000000:
-            # 2-byte utf-8 character encoding
-            span = 2
-            if n - i >= span:
-                next_body = list(map(
-                    lambda x: x & 0b11000000 == 0b10000000,
-                    data[i + 1: i + span],
-                ))
-                if not all(next_body):
-                    return False
-                skip = span - 1
-            else:
+    Return: True if data is a valid UTF-8 encoding, else return False.
+    """
+    num_bytes = 0
+    for num in data:
+        bin_rep = format(num, '#010b')[-8:]
+        if num_bytes == 0:
+            for bit in bin_rep:
+                if bit == '0':
+                    break
+                num_bytes += 1
+
+            if num_bytes == 0:
+                continue
+
+            if num_bytes == 1 or num_bytes > 4:
                 return False
         else:
-            return False
-    return True
+            if not (bin_rep[0] == '1' and bin_rep[1] == '0'):
+                return False
+
+        num_bytes -= 1
+
+    return num_bytes == 0

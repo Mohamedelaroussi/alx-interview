@@ -1,57 +1,24 @@
 #!/usr/bin/python3
-
-import sys
-
-
-def solve(row, column):
-    solver = [[]]
-    for q in range(row):
-        solver = place_queen(q, column, solver)
-    return solver
+"""N Queens puzzle challenge"""
+from sys import argv
 
 
-def place_queen(q, column, prev_solver):
-    solver_queen = []
-    for array in prev_solver:
-        for x in range(column):
-            if is_safe(q, x, array):
-                solver_queen.append(array + [x])
-    return solver_queen
+def close(err: str) -> None:
+    """Prints an error message from input validation and exits program"""
+    print(err)
+    exit(1)
 
 
-def is_safe(q, x, array):
-    if x in array:
-        return (False)
-    else:
-        return all(abs(array[column] - x) != q - column
-                   for column in range(q))
-
-
-def init():
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
-    if sys.argv[1].isdigit():
-        the_queen = int(sys.argv[1])
-    else:
-        print("N must be a number")
-        sys.exit(1)
-    if the_queen < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-    return(the_queen)
-
-
-def n_queens():
-
-    the_queen = init()
-    solver = solve(the_queen, the_queen)
-    for array in solver:
-        clean = []
-        for q, x in enumerate(array):
-            clean.append([q, x])
-        print(clean)
+def main() -> None:
+    """Starting point and aggregator for the program"""
+    if len(argv) != 2:
+        close('Usage: nqueens N')
+    elif not argv[1].isnumeric():
+        close('N must be a number')
+    elif int(argv[1]) < 4:
+        close('N must be at least 4')
 
 
 if __name__ == '__main__':
-    n_queens()
+    """Tests the code in this module"""
+    main()

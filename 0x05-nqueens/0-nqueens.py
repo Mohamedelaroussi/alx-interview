@@ -1,69 +1,68 @@
 #!/usr/bin/python3
-"""Module with solution for the N-Queens challenge with backtracking"""
+"""
+Solution to the nqueens problem
+"""
 import sys
 
 
-def chessboard(pos, n):
-    """Function to print chessboard with appropriate positions of queens"""
+def backtrack(r, n, cols, pos, neg, board):
+    """
+    backtrack function to find solution
+    """
+    if r == n:
+        res = []
+        for l in range(len(board)):
+            for k in range(len(board[l])):
+                if board[l][k] == 1:
+                    res.append([l, k])
+        print(res)
+        return
 
-    board = []
+    for c in range(n):
+        if c in cols or (r + c) in pos or (r - c) in neg:
+            continue
 
-    for RANK in range(n):
-        for FILE in range(n):
-            if FILE == pos[RANK]:
-                board.append([RANK, FILE])
+        cols.add(c)
+        pos.add(r + c)
+        neg.add(r - c)
+        board[r][c] = 1
 
-    print(board)
+        backtrack(r+1, n, cols, pos, neg, board)
 
-
-def safe_pos(pos, RANK, FILE, n):
-    """Function to determine safe a square to place a queen"""
-
-    if (pos[RANK] == FILE) or (pos[RANK] == FILE - RANK + n) or \
-            (pos[RANK] == RANK - n + FILE):
-        return True
-    return False
-
-
-def get_safe_pos(board, rank, n):
-    """Function to get all safe positions to place queens with recursion"""
-
-    if rank == n:
-        chessboard(board, n)
-    else:
-        for FILE in range(n):
-            safe = True
-
-            for RANK in range(rank):
-                if safe_pos(board, RANK, FILE, rank):
-                    safe = False
-
-            if safe:
-                board[rank] = FILE
-                get_safe_pos(board, rank + 1, n)
+        cols.remove(c)
+        pos.remove(r + c)
+        neg.remove(r - c)
+        board[r][c] = 0
 
 
-def create_board(n):
-    """Function to generate chessboard of n-size"""
+def nqueens(n):
+    """
+    Solution to nqueens problem
+    Args:
+        n (int): number of queens. Must be >= 4
+    Return:
+        List of lists representing coordinates of each
+        queen for all possible solutions
+    """
+    cols = set()
+    pos_diag = set()
+    neg_diag = set()
+    board = [[0] * n for i in range(n)]
 
-    return [0 * n for i in range(n)]
-
-
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    exit(1)
-
-try:
-    n = int(sys.argv[1])
-except Exception:
-    print("N must be a number")
-    exit(1)
-
-if (n < 4):
-    print("N must be at least 4")
-    exit(1)
+    backtrack(0, n, cols, pos_diag, neg_diag, board)
 
 
-board = create_board(int(n))
-rank = 0
-get_safe_pos(board, rank, int(n))
+if __name__ == "__main__":
+    n = sys.argv
+    if len(n) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    try:
+        nn = int(n[1])
+        if nn < 4:
+            print("N must be at least 4")
+            sys.exit(1)
+        nqueens(nn)
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
